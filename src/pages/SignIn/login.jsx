@@ -1,74 +1,104 @@
-
 import React, { useState } from 'react';
-import "./login.css"; // Importando o CSS para estilização
+import {TextField,Button,Typography,Paper,Link,Box,Alert} from '@mui/material';
+import { useLocation } from 'wouter';
 
 function Login() {
-  // Estados para guardar o email e a senha digitados pelo usuário
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // Estado para mensagens de erro
+  const [error, setError] = useState('');
+  const [, navigate] = useLocation(); // Para navegação com Wouter
 
-  // Função chamada quando o formulário é submetido
   const handleSubmit = (event) => {
-    event.preventDefault(); // Previne o recarregamento da página padrão do formulário
-    setError(''); // Limpa erros anteriores
-
-    // --- Lógica de Autenticação (Aqui entra a sua validação) ---
-    // Exemplo MUITO básico:
-    console.log('Tentativa de login com:', { email, password });
+    event.preventDefault();
+    setError('');
 
     if (!email || !password) {
       setError('Por favor, preencha o email e a senha.');
-        return;
-      }
-    };
+      return;
+    }
 
-
+    // Simula login
+    if (email === 'admin@email.com' && password === '123456') {
+      navigate('/home');
+    } else {
+      setError('Credenciais inválidas. Tente novamente.');
+    }
+  };
 
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h1>Gestão de Condomínios</h1>
-        <h2>Login</h2>
+    <Box
+      sx={{
+        height: '100vh',
+        backgroundColor: '#f5f5f5',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 2,
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: 4, maxWidth: 400, width: '100%' }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          Gestão de Condomínios
+        </Typography>
+        <Typography variant="h4" align="center" gutterBottom>
+          Login
+        </Typography>
 
-        {error && <p className="error-message">{error}</p>} {/* Exibe a mensagem de erro */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Email"
+            variant="outlined"
             type="email"
-            id="email"
+            fullWidth
+            margin="normal"
             value={email}
-            onChange={(e) => setEmail(e.target.value)} // Atualiza o estado 'email'
-            placeholder="Digite seu email"
-            required // Validação básica do HTML5
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Senha:</label>
-          <input
+          <TextField
+            label="Senha"
+            variant="outlined"
             type="password"
-            id="password"
+            fullWidth
+            margin="normal"
             value={password}
-            onChange={(e) => setPassword(e.target.value)} // Atualiza o estado 'password'
-            placeholder="Digite sua senha"
-            required // Validação básica do HTML5
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
-        </div>
 
-        <button type="submit" className="login-button">
-          Entrar
-        </button>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Entrar
+          </Button>
+        </form>
 
-        {/* Opcional: Link para esqueci minha senha ou cadastro */}
-        <div className="form-links">
-          <a href="/forgot-password">Esqueceu a senha?</a>
-          <span> | </span>
-          <a href="/register">Cadastre-se</a>
-        </div>
-      </form>
-    </div>
+        <Box
+          sx={{
+            marginTop: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Link href="/forgot-password" underline="hover">
+            Esqueceu a senha?
+          </Link>
+          <Link href="/register" underline="hover">
+            Cadastre-se
+          </Link>
+        </Box>
+      </Paper>
+    </Box>
   );
 }
 
