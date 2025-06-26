@@ -1,6 +1,8 @@
 import { Paper, Typography, Button } from "@mui/material";
+import React from "react";
 
-function HeroSection({ userName }) {
+function HeroSection () {
+  const userName = JSON.parse(localStorage.getItem("user") || "{}").name || "";
   return (
     <Paper elevation={3} style={{ padding: "20px", margin: "20px" }}>
       <Typography variant="h4" gutterBottom>

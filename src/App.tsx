@@ -2,9 +2,11 @@
 import { Route, Router, Link } from "wouter";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import React from "react";
 
 import Login from "./pages/SignIn/login";
 import Home from "./pages/Home/HomePage";
+import register from "./pages/SignIn/register";
 
 // Criação do tema com Material-UI
 // Define as cores primária e secundária, além da tipografia
@@ -31,6 +33,10 @@ function App() {
 
         <Route path="/" component={Login} />
         <Route path="/home" component={Home} />
+        <Route path="/SignIn/login" component={Login} />
+        <Route path="/SignIn/register" component={register} />
+
+
       </Router>
     </ThemeProvider>
   );

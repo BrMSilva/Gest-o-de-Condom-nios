@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {TextField,Button,Typography,Paper,Link,Box,Alert} from '@mui/material';
+import { TextField, Button, Typography, Paper, Link, Box, Alert } from '@mui/material';
 import { useLocation } from 'wouter';
 
 function Login() {
@@ -8,7 +8,9 @@ function Login() {
   const [error, setError] = useState('');
   const [, navigate] = useLocation(); // Para navegação com Wouter
 
-  const handleSubmit = (event) => {
+  interface LoginFormEvent extends React.FormEvent<HTMLFormElement> { }
+
+  const handleSubmit = async (event: LoginFormEvent): Promise<void> => {
     event.preventDefault();
     setError('');
 
@@ -17,12 +19,37 @@ function Login() {
       return;
     }
 
-    // Simula login
-    if (email === 'admin@email.com' && password === '123456') {
-      navigate('/home');
-    } else {
-      setError('Credenciais inválidas. Tente novamente.');
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error('Erro ao fazer login.');
+      }
+
+      if (data.success) {
+        // Armazena o token de autenticação no localStorage
+        localStorage.setItem('token', data.token);
+        // Redireciona para a página inicial após o login
+
+        localStorage.setItem('user', JSON.stringify(data.user)); // Armazena os dados do usuário
+        
+        navigate('/Home');
+      } else {
+        setError(data.message || 'Erro ao fazer login. Por favor, tente novamente.');
+      }
+    } catch (error) {
+      setError('Erro ao fazer login. Por favor, tente novamente.');
+      console.error('Erro ao fazer login:', error);
     }
+
   };
 
   return (
@@ -93,7 +120,7 @@ function Login() {
           <Link href="/forgot-password" underline="hover">
             Esqueceu a senha?
           </Link>
-          <Link href="/register" underline="hover">
+          <Link href="/SignIn/register" underline="hover">
             Cadastre-se
           </Link>
         </Box>
