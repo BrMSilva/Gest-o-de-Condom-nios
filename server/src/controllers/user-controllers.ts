@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../prisma/client.ts';
 import { body, Meta, validationResult } from 'express-validator';
 import { genPassword } from '../lib/passwordUtils.ts';
 import { Request, Response } from 'express';
-
-const prisma = new PrismaClient();
 
 // validation error msgs
 const alphaErr = 'Must only contain letters.';
