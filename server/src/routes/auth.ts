@@ -2,11 +2,12 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { validPassword } from '../lib/passwordUtils.ts';
+import config from '../config/config.ts';
 
-const router = Router();
+const router: Router = Router();
 const prisma = new PrismaClient();
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res): Promise<any> => {
   try {
     //get user from username
     const user = await prisma.user.findUnique({
@@ -31,7 +32,7 @@ router.post('/login', async (req, res) => {
     //else was successfull return jwt token
     jwt.sign(
       { sub: user.id },
-      process.env.JWT_SECRET,
+      config.jwtSecret,
       { expiresIn: '1d' },
       (err, token) => {
         res.json({

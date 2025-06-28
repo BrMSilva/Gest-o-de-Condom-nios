@@ -1,16 +1,24 @@
 import passport from 'passport';
-import { Strategy as JwtStrategy } from 'passport-jwt';
+import { Strategy as JwtStrategy, VerifiedCallback } from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
 import { PrismaClient } from '@prisma/client';
+import config from '../config/config';
+
+type JwtPayload = {
+  sub: string;
+};
 
 const prisma = new PrismaClient();
 
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
+  secretOrKey: config.jwtSecret,
 };
 
-const verifyCallback = async (jwt_payload, done) => {
+const verifyCallback = async (
+  jwt_payload: JwtPayload,
+  done: VerifiedCallback,
+) => {
   try {
     console.log(jwt_payload);
     //get user from the token
