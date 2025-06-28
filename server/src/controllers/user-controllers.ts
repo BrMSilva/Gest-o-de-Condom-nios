@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { body, validationResult } from 'express-validator';
+import { body, Meta, validationResult } from 'express-validator';
 import { genPassword } from '../lib/passwordUtils.ts';
+import { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
 
@@ -8,7 +9,6 @@ const prisma = new PrismaClient();
 const alphaErr = 'Must only contain letters.';
 const lengthErr = 'Must be between 1 and 10 characters.';
 const pwLengthErr = 'Password must be between 4 to 16 characters';
-const pwMatch = 'Passwords must match';
 const emailErr = 'Must be a valid email';
 const usedEmailErr = 'This email has an account';
 
@@ -43,7 +43,7 @@ const validateUser = [
   body('confirmPw').trim().notEmpty().custom(matchPw).withMessage(''),
 ];
 
-async function checkEmail(email) {
+async function checkEmail(email: string) {
   const existingUser = await prisma.user.findUnique({
     where: { email: email },
   });
@@ -52,10 +52,10 @@ async function checkEmail(email) {
   }
 }
 
-async function matchPw(confirmPassword, { req }) {
-  const password = req.body.password;
+async function matchPw(confirmPassword: string, { req }: Meta) {
+  const password = req.body?.password;
   if (password !== confirmPassword) {
-    throw new Error('Passwords must be same');
+    throw new Error('Passwords must match');
   }
 }
 
@@ -63,8 +63,7 @@ async function matchPw(confirmPassword, { req }) {
 
 export const newUser = [
   validateUser,
-  async (req, res) => {
-    console.log('username:' + req.body.firstname);
+  async (req: Request, res: Response): Promise<any> => {
     const { firstname, lastname, email, password } = req.body;
     const errors = validationResult(req);
 
@@ -93,10 +92,10 @@ export const newUser = [
   },
 ];
 
-export function getSessionUser(req, res) {
+export function getJwtUser(req: Request, res: Response) {
   const user = req.user;
   if (user) {
-    var safeUser = {
+    const safeUser = {
       email: user.email,
       firstname: user.firstname,
       isAuth: true,
