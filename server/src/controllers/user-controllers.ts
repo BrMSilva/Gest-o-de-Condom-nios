@@ -1,7 +1,12 @@
-import prisma from '../prisma/client.ts';
-import { body, Meta, validationResult } from 'express-validator';
-import { genPassword } from '../lib/passwordUtils.ts';
-import { Request, Response } from 'express';
+import prisma from '../prisma/client';
+import {
+  body,
+  Meta,
+  ValidationChain,
+  validationResult,
+} from 'express-validator';
+import { genPassword } from '../lib/passwordUtils';
+import { RequestHandler } from 'express';
 
 // validation error msgs
 const alphaErr = 'Must only contain letters.';
@@ -59,16 +64,17 @@ async function matchPw(confirmPassword: string, { req }: Meta) {
 
 //---middlewares---
 
-export const newUser = [
+export const newUser: (ValidationChain[] | RequestHandler)[] = [
   validateUser,
-  async (req: Request, res: Response): Promise<any> => {
+  async (req, res): Promise<void> => {
     const { firstname, lastname, email, password } = req.body;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(400).json({
+      res.status(400).json({
         errors: errors.array(),
       });
+      return;
     }
 
     const { salt, hashPw } = genPassword(password);
@@ -90,7 +96,7 @@ export const newUser = [
   },
 ];
 
-export function getJwtUser(req: Request, res: Response) {
+export const getJwtUser: RequestHandler = (req, res) => {
   const user = req.user;
   if (user) {
     const safeUser = {
@@ -103,4 +109,4 @@ export function getJwtUser(req: Request, res: Response) {
   } else {
     res.json({ isAuth: false });
   }
-}
+};

@@ -1,32 +1,42 @@
-import { Router } from 'express';
-import prisma from '../prisma/client.ts';
+import prisma from '../prisma/client';
 import jwt from 'jsonwebtoken';
-import { validPassword } from '../lib/passwordUtils.ts';
-import config from '../config/config.ts';
+import { validPassword } from '../lib/passwordUtils';
+import config from '../config/config';
+import { Router } from 'express';
+import { AsyncHandler } from '../../types/express-utils';
 
 const router: Router = Router();
 
-router.post('/login', async (req, res): Promise<any> => {
+router.get('/test', (_req, res) => {
+  res.status(200).json({ res: 'ok' });
+});
+
+// put in controller
+const postLogin: AsyncHandler = async (req, res) => {
   try {
     //get user from username
     const user = await prisma.user.findUnique({
       where: { email: req.body.email },
     });
 
-    if (!user)
-      return res.status(401).json({
+    if (!user) {
+      res.status(401).json({
         success: false,
         message: 'Incorrect email',
       });
+      return;
+    }
 
     //else check password
     const match = validPassword(req.body.password, user.password, user.salt);
 
-    if (!match)
-      return res.status(401).json({
+    if (!match) {
+      res.status(401).json({
         success: false,
         message: 'Incorrect password',
       });
+      return;
+    }
 
     //else was successfull return jwt token
     jwt.sign(
@@ -40,14 +50,13 @@ router.post('/login', async (req, res): Promise<any> => {
         });
       },
     );
-    return;
   } catch (err) {
     console.log(err);
-    return res
-      .status(405)
-      .json({ success: false, message: 'Error!', error: err });
+    res.status(405).json({ success: false, message: 'Error!', error: err });
   }
-});
+};
+
+router.post('/login', postLogin);
 
 router.get('/logout', (req, res, next) => {
   req.logout((err) => {

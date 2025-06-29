@@ -1,6 +1,6 @@
-import auth from './auth.ts';
-import users from './users.ts';
-import protectedRouter from './protected.ts';
+import auth from './auth';
+import users from './users';
+import protectedRouter from './protected';
 
 export default {
   users,

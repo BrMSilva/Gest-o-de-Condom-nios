@@ -25,6 +25,6 @@ server.use('/auth', routes.auth);
 server.use('/protected', routes.protectedRouter);
 
 //---- SERVER ----
-server.listen(config.clientHost, () => {
+server.listen(config.port, () => {
   console.log(`Server online on ${config.port}`);
 });

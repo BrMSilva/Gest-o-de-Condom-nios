@@ -1,8 +1,10 @@
 import passport from 'passport';
-import { Strategy as JwtStrategy, VerifiedCallback } from 'passport-jwt';
+import passportJwt from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
 import { PrismaClient } from '@prisma/client';
 import config from '../config/config';
+
+const { Strategy: JwtStrategy } = passportJwt;
 
 type JwtPayload = {
   sub: string;
@@ -17,7 +19,7 @@ const options = {
 
 const verifyCallback = async (
   jwt_payload: JwtPayload,
-  done: VerifiedCallback,
+  done: passportJwt.VerifiedCallback,
 ) => {
   try {
     console.log(jwt_payload);
