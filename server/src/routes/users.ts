@@ -1,12 +1,24 @@
-import { Router } from 'express';
 import passport from 'passport';
+import { Router } from 'express';
 const router = Router();
 
-import { newUser, getJwtUser } from '../controllers/user-controllers';
+import {
+  newUser,
+  getLogin,
+  postLogin,
+  postLogout,
+} from '../controllers/user-controllers';
 
-router.get('/', passport.authenticate('jwt', { session: false }), getJwtUser);
+// ---- LOGIN ----
+router.get(
+  '/login',
+  passport.authenticate('jwt', { session: false }),
+  getLogin,
+);
+router.post('/login', postLogin);
+router.post('/logout', postLogout);
 
-//Register new user
+// ---- POST ROUTES ----
 router.post('/register', ...newUser);
 
 export default router;

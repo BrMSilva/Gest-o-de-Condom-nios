@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "typeRoots": ["./node_modules/@types", "./types"],
+    "typeRoots": ["./types", "./node_modules/@types"],
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
     "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
@@ -12,6 +12,6 @@
     /* Completeness */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*", "types"],
-  "exclude": ["src/node_modules"]
+  "include": ["src/**/*", "types/*"],
+  "files": ["./types/global.d.ts"]
 }

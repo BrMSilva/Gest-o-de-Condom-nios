@@ -1,12 +1,15 @@
 import prisma from '../prisma/client';
+import { RequestHandler } from 'express';
 import {
   body,
   Meta,
   ValidationChain,
   validationResult,
 } from 'express-validator';
-import { genPassword } from '../lib/passwordUtils';
-import { RequestHandler } from 'express';
+import jwt from 'jsonwebtoken';
+
+import { genPassword, validPassword } from '../lib/passwordUtils';
+import config from '../config/config';
 
 // validation error msgs
 const alphaErr = 'Must only contain letters.';
@@ -46,6 +49,7 @@ const validateUser = [
   body('confirmPw').trim().notEmpty().custom(matchPw).withMessage(''),
 ];
 
+// ---- Custom validators ----
 async function checkEmail(email: string) {
   const existingUser = await prisma.user.findUnique({
     where: { email: email },
@@ -62,7 +66,78 @@ async function matchPw(confirmPassword: string, { req }: Meta) {
   }
 }
 
-//---middlewares---
+// ---- ROUTE HANDLERS ----
+
+// Route GET /login -> check in user is logged in
+export const getLogin: RequestHandler = (req, res) => {
+  const user = req.user;
+  if (user) {
+    const safeUser = {
+      email: user.email,
+      firstname: user.firstname,
+      isLoggedIn: true,
+    };
+    res.json(safeUser);
+    return;
+  } else {
+    res.json({ isLoggedIn: false });
+  }
+};
+
+// Route POST /login
+export const postLogin: RequestHandler = async (req, res) => {
+  try {
+    //get user from username
+    const user = await prisma.user.findUnique({
+      where: { email: req.body.email },
+    });
+
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: 'Incorrect email',
+      });
+      return;
+    }
+
+    //else check password
+    const match = validPassword(req.body.password, user.password, user.salt);
+
+    if (!match) {
+      res.status(401).json({
+        success: false,
+        message: 'Incorrect password',
+      });
+      return;
+    }
+
+    //else was successfull return jwt token
+    jwt.sign(
+      { sub: user.id },
+      config.jwtSecret,
+      { expiresIn: '1d' },
+      (err, token) => {
+        res.json({
+          success: true,
+          token,
+        });
+      },
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(405).json({ success: false, message: 'Error!', error: err });
+  }
+};
+
+// Route POST /logout
+export const postLogout: RequestHandler = (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+  });
+  res.json({ message: 'user logged out' });
+};
 
 export const newUser: (ValidationChain[] | RequestHandler)[] = [
   validateUser,
@@ -95,18 +170,3 @@ export const newUser: (ValidationChain[] | RequestHandler)[] = [
     });
   },
 ];
-
-export const getJwtUser: RequestHandler = (req, res) => {
-  const user = req.user;
-  if (user) {
-    const safeUser = {
-      email: user.email,
-      firstname: user.firstname,
-      isAuth: true,
-    };
-    res.json(safeUser);
-    return;
-  } else {
-    res.json({ isAuth: false });
-  }
-};

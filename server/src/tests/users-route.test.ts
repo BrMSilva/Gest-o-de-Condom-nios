@@ -5,14 +5,11 @@ import express, { urlencoded } from 'express';
 const app = express();
 
 app.use(urlencoded({ extended: false }));
-//---- ROUTES ----
 app.use('/users', routes.users);
-app.use('/auth', routes.auth);
-app.use('/protected', routes.protectedRouter);
 
 test('testing route works', (done) => {
   request(app)
-    .get('/auth/test')
+    .get('/')
     .expect('Content-Type', /json/)
     .expect({ res: 'ok' })
     .expect(200, done);

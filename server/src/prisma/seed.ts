@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-import { genPassword } from '../lib/passwordUtils.ts';
+import { genPassword } from '../lib/passwordUtils';
 
 const pw = genPassword('teste');
 

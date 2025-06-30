@@ -5,7 +5,7 @@ const router: Router = Router();
 
 router.use(passport.authenticate('jwt', { session: false }));
 
-router.use('/', (req, res) => {
+router.use('/', (_req, res) => {
   res.status(200).json({
     success: true,
     msg: 'You are successfully authenticated to this router!',

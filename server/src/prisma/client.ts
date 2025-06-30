@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import config from '../config/config.ts';
+import config from '../config/config';
 
 // configure prisma client instance with different db for testing
 const dbUrl =
