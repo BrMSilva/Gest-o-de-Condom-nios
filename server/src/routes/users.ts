@@ -1,13 +1,31 @@
-import { Router } from 'express';
-import { Request, Response } from 'express';
 import passport from 'passport';
+import { Router } from 'express';
 const router = Router();
 
-import { newUser, getJwtUser } from '../controllers/user-controllers.ts';
+import {
+  postRegister,
+  getLogin,
+  postLogin,
+  postLogout,
+} from '../controllers/user-controllers';
 
-router.get('/', passport.authenticate('jwt', { session: false }), getJwtUser);
+// ---- Testing check ----
+if (process.env.NODE_ENV === 'test') {
+  router.get('/', (_req, res) => {
+    res.status(200).json({ res: 'ok' });
+  });
+}
 
-//Register new user
-router.post('/register', ...newUser);
+// ---- LOGIN ----
+router.get(
+  '/login',
+  passport.authenticate('jwt', { session: false }),
+  getLogin,
+);
+router.post('/login', postLogin);
+router.post('/logout', postLogout);
+
+// ---- POST ROUTES ----
+router.post('/register', ...postRegister);
 
 export default router;

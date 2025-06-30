@@ -1,9 +1,10 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
 interface Config {
   port: number;
   nodeEnv: string;
-  dbUrl: string;
+  databaseUrl: string;
   jwtSecret: string;
   clientHost: string;
 }
@@ -11,9 +12,9 @@ interface Config {
 const config: Config = {
   port: Number(process.env.SERVER_PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
-  dbUrl: process.env.DATABASE_URL || '',
   jwtSecret: process.env.JWT_SECRET || 'secret',
   clientHost: process.env.CLIENT_HOST || 'http://localhost:5173/',
+  databaseUrl: process.env.DATABASE_URL || '',
 };
 
 export default config;
