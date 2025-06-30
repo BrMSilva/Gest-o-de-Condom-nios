@@ -14,4 +14,5 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1', // remove .js from imports when using TS
   },
+  globalSetup: './jest-global-setup.ts',
 };

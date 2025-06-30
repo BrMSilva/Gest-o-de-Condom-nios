@@ -10,7 +10,7 @@
     "lint": "eslint --ext .js,.ts ."
   },
   "prisma": {
-    "seed": "ts-node --transpile-only ./seed.ts"
+    "seed": "ts-node --transpile-only ./src/prisma/seed.ts"
   },
   "keywords": [],
   "author": "",

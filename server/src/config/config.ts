@@ -7,7 +7,6 @@ interface Config {
   databaseUrl: string;
   jwtSecret: string;
   clientHost: string;
-  testDb: string;
 }
 
 const config: Config = {
@@ -16,7 +15,6 @@ const config: Config = {
   jwtSecret: process.env.JWT_SECRET || 'secret',
   clientHost: process.env.CLIENT_HOST || 'http://localhost:5173/',
   databaseUrl: process.env.DATABASE_URL || '',
-  testDb: process.env.TEST_TESTE_DB_URL || '',
 };
 
 export default config;

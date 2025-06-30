@@ -9,6 +9,13 @@ import {
   postLogout,
 } from '../controllers/user-controllers';
 
+// ---- Testing check ----
+if (process.env.NODE_ENV === 'test') {
+  router.get('/', (_req, res) => {
+    res.status(200).json({ res: 'ok' });
+  });
+}
+
 // ---- LOGIN ----
 router.get(
   '/login',

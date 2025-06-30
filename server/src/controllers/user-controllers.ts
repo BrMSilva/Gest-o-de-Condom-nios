@@ -11,6 +11,12 @@ import jwt from 'jsonwebtoken';
 import { genPassword, validPassword } from '../lib/passwordUtils';
 import config from '../config/config';
 
+type SafeUser = {
+  firstname: string;
+  email: string;
+  isLoggedIn: boolean;
+};
+
 // validation error msgs
 const alphaErr = 'Must only contain letters.';
 const lengthErr = 'Must be between 1 and 10 characters.';
@@ -72,7 +78,7 @@ async function matchPw(confirmPassword: string, { req }: Meta) {
 export const getLogin: RequestHandler = (req, res) => {
   const user = req.user;
   if (user) {
-    const safeUser = {
+    const safeUser: SafeUser = {
       email: user.email,
       firstname: user.firstname,
       isLoggedIn: true,
