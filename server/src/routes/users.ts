@@ -3,7 +3,7 @@ import { Router } from 'express';
 const router = Router();
 
 import {
-  newUser,
+  postRegister,
   getLogin,
   postLogin,
   postLogout,
@@ -26,6 +26,6 @@ router.post('/login', postLogin);
 router.post('/logout', postLogout);
 
 // ---- POST ROUTES ----
-router.post('/register', ...newUser);
+router.post('/register', ...postRegister);
 
 export default router;

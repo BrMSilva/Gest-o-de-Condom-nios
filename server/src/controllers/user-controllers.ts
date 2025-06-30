@@ -14,7 +14,7 @@ import config from '../config/config';
 type SafeUser = {
   firstname: string;
   email: string;
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
 };
 
 // validation error msgs
@@ -131,7 +131,7 @@ export const postLogin: RequestHandler = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    res.status(405).json({ success: false, message: 'Error!', error: err });
+    res.status(405).json({ success: false, message: 'Error!' });
   }
 };
 
@@ -145,7 +145,7 @@ export const postLogout: RequestHandler = (req, res, next) => {
   res.json({ message: 'user logged out' });
 };
 
-export const newUser: (ValidationChain[] | RequestHandler)[] = [
+export const postRegister: (ValidationChain[] | RequestHandler)[] = [
   validateUser,
   async (req, res): Promise<void> => {
     const { firstname, lastname, email, password } = req.body;
@@ -170,8 +170,14 @@ export const newUser: (ValidationChain[] | RequestHandler)[] = [
       },
     });
 
+    const safeUser: SafeUser = {
+      firstname: user.firstname,
+      email: user.email,
+      isLoggedIn: false,
+    };
+
     res.json({
-      user,
+      user: safeUser,
       message: 'User created successfully',
     });
   },

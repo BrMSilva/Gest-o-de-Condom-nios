@@ -93,28 +93,86 @@ type RegisterForm = {
   password: string;
   confirmPw: string;
 };
-const correctForm: RegisterForm = {
+const goodForm: RegisterForm = {
   firstname: 'user',
   lastname: 'lastname',
   email: 'user@user.com',
   password: 'user',
   confirmPw: 'user',
 };
+const badForm: RegisterForm = {
+  firstname: '',
+  lastname: '123',
+  email: 'bademail',
+  password: '123',
+  confirmPw: '12',
+};
 
 test('POST /register - validation fails with wrongly formated fields', (done) => {
-  //firstname too long
   request(app)
     .post('/users/register')
-    .send({ ...correctForm, firstname: 'a-name-thats-too-long' })
+    .send(badForm)
     .expect('Content-Type', /json/)
     .expect(400)
-    .then((res) => {
-      const errorMsg = 'First name Must be between 1 and 10 characters.';
-      const lengthError = res.body.errors?.find(
-        (err: { msg: string }) => err.msg === errorMsg,
-      );
+    .expect((res) => {
+      expect(res.body).toHaveProperty('errors');
+      expect(Array.isArray(res.body.errors)).toBe(true);
+      expect(res.body.errors.length).toBe(7);
+    })
+    .end(done);
+});
 
-      expect(lengthError).toBeDefined();
-      done();
-    }, done);
+test('POST /register - validation fails with existing email', (done) => {
+  request(app)
+    .post('/users/register')
+    .send({ ...goodForm, email: 'teste@teste.com' })
+    .expect('Content-Type', /json/)
+    .expect(400)
+    .expect((res) => {
+      expect(res.body).toHaveProperty('errors');
+      expect(res.body.errors[0].msg).toBe('This email has an account');
+    })
+    .end(done);
+});
+
+test('POST /resgister - creates user', (done) => {
+  request(app)
+    .post('/users/register')
+    .send(goodForm)
+    .expect('Content-Type', /json/)
+    .expect(200)
+    .then((res) => {
+      expect(res.body).toHaveProperty('message', 'User created successfully');
+      expect(res.body).toHaveProperty('user', {
+        firstname: goodForm.firstname,
+        email: goodForm.email,
+        isLoggedIn: false,
+      });
+
+      request(app)
+        .post('/users/login')
+        .send({ email: goodForm.email, password: goodForm.password })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).toHaveProperty('success', true);
+          expect(res.body).toHaveProperty('token');
+          expect(typeof res.body.token).toBe('string');
+          expect(res.body.token.length).toBeGreaterThan(10);
+
+          request(app) // use the token to GET a protected route
+            .get('/users/login')
+            .auth(res.body.token, { type: 'bearer' })
+            .expect(
+              {
+                email: goodForm.email,
+                firstname: goodForm.firstname,
+                isLoggedIn: true,
+              },
+              done,
+            );
+        })
+        .catch((err) => done(err));
+    })
+    .catch((err) => done(err));
 });
